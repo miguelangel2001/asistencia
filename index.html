@@ -3,103 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrando Asistencia...</title>
+    <title>Cuestionario de Registro</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
         }
-        #mensaje {
-            display: none;
-            padding: 20px;
+        .container {
+            background-color: #ffffff;
             border-radius: 10px;
-            background-color: #4caf50;
-            color: white;
-            font-size: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
             text-align: center;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            color: #4CAF50;
         }
-        #spinner {
-            border: 6px solid #f3f3f3; /* Light grey */
-            border-top: 6px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
+        label {
+            font-size: 14px;
+            color: #555;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        input, select, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border: 1px solid #4CAF50;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div id="spinner"></div>
-    <div id="mensaje">Registrando asistencia...</div>
+    <div class="container">
+        <h1>Registro</h1>
+        <form id="registroForm" action="http://localhost:8080/empresa/guardarDatos.jsp" method="POST">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
+
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" placeholder="Ingrese su apellido" required>
+
+            <label for="unidad">Unidad:</label>
+            <input type="text" id="unidad" name="unidad" placeholder="Ingrese su unidad" required>
+
+            <button type="submit">Enviar</button>
+        </form>
+
+        <!-- Mensaje de éxito -->
+        <div id="successMessage" class="success-message">
+            ¡Datos enviados con éxito!
+        </div>
+    </div>
 
     <script>
-        // Función para enviar datos automáticamente
-        function enviarDatosAlServidor() {
-            // Capturar los parámetros de la URL
-            const params = new URLSearchParams(window.location.search);
-            const nombre = params.get("nombre");
-            const apellido = params.get("apellido");
-            const unidad = params.get("unidad");
+        // Capturar el evento submit del formulario
+        const form = document.getElementById('registroForm');
+        const successMessage = document.getElementById('successMessage');
 
-            // Validar si los datos están presentes
-            if (nombre && apellido && unidad) {
-                // Enviar los datos al servidor
-                fetch("http://localhost:8080/empresa/guardarDatos.jsp", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: `nombre=${encodeURIComponent(nombre)}&apellido=${encodeURIComponent(apellido)}&unidad=${encodeURIComponent(unidad)}`
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Mostrar el mensaje de éxito
-                        mostrarMensaje("¡Asistencia registrada con éxito!", true);
-                    } else {
-                        // Mostrar mensaje de error
-                        mostrarMensaje("Error al registrar la asistencia.", false);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    mostrarMensaje("Error al conectar con el servidor.", false);
-                });
-            } else {
-                mostrarMensaje("Datos incompletos en el QR.", false);
-            }
-        }
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevenir el envío automático del formulario para mostrar el mensaje
 
-        // Función para mostrar mensajes
-        function mostrarMensaje(texto, exito) {
-            const mensaje = document.getElementById("mensaje");
-            mensaje.textContent = texto;
-            mensaje.style.backgroundColor = exito ? "#4caf50" : "#e74c3c";
-            mensaje.style.display = "block";
+            // Simular el envío (se puede deshabilitar en producción)
+            setTimeout(() => {
+                successMessage.style.display = 'block'; // Mostrar mensaje de éxito
+                form.reset(); // Reiniciar el formulario después de enviar
+            }, 500);
 
-            // Ocultar el spinner
-            document.getElementById("spinner").style.display = "none";
-
-            // Redirigir después de 3 segundos (opcional)
-            if (exito) {
-                setTimeout(() => {
-                    window.location.href = "http://localhost:8080/empresa/admin.jsp";
-                }, 3000);
-            }
-        }
-
-        // Ejecutar al cargar la página
-        window.onload = enviarDatosAlServidor;
+            // Si realmente deseas enviar los datos al servidor, desactiva la línea anterior y quita `e.preventDefault()`.
+            form.submit(); // Enviar el formulario al servidor
+        });
     </script>
 </body>
 </html>
