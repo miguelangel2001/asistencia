@@ -3,166 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Trabajador</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        h1 {
-            text-align: center;
-            color: #4CAF50;
-        }
+    <title>Registro de Asistencia</title>
+    <script>
+        // Enviar datos automáticamente al servidor
+        function enviarDatosAlServidor() {
+            // Obtener parámetros de la URL
+            const params = new URLSearchParams(window.location.search);
+            const nombre = params.get("nombre");
+            const apellido = params.get("apellido");
+            const unidad = params.get("unidad");
 
-        /* Form Styles */
-        form {
-            max-width: 400px;
-            width: 90%;
-            margin: auto;
-            padding: 20px;
-            background: #ffffff;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        label {
-            font-weight: bold;
-            color: #333;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            max-width: 300px;
-            width: 80%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .modal-content h2 {
-            color: #4CAF50;
-        }
-        .modal-content button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .modal-content button:hover {
-            background-color: #45a049;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 20px;
-            }
-            form {
-                padding: 15px;
-            }
-            button {
-                font-size: 14px;
+            // Verificar si los parámetros existen
+            if (nombre && apellido && unidad) {
+                fetch("http://localhost:8080/empresa/guardarDatos.jsp", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: `nombre=${nombre}&apellido=${apellido}&unidad=${unidad}`,
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        alert("Datos registrados con éxito.");
+                    } else {
+                        alert("Error al registrar los datos.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+            } else {
+                alert("No se encontraron datos en el QR.");
             }
         }
-    </style>
+
+        // Ejecutar la función al cargar la página
+        window.onload = enviarDatosAlServidor;
+    </script>
 </head>
 <body>
-    <h1>Registrar Trabajador</h1>
-    <form id="registroForm" action="RegistrarTrabajadorServlet" method="post" onsubmit="mostrarModal(event)">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre" required>
-
-        <label for="apellido">Apellido:</label>
-        <input type="text" id="apellido" name="apellido" placeholder="Ingrese su apellido" required>
-
-        <label for="unidad">Unidad:</label>
-        <input type="text" id="unidad" name="unidad" placeholder="Ingrese la unidad" required>
-
-        <button type="submit">Registrar</button>
-    </form>
-
-    <!-- Modal -->
-    <div class="modal" id="modalExito">
-        <div class="modal-content">
-            <h2>¡Registro Exitoso!</h2>
-            <p>Los datos han sido enviados correctamente.</p>
-            <button onclick="cerrarModal()">Aceptar</button>
-        </div>
-    </div>
-
-    <script>
-        function mostrarModal(event) {
-            event.preventDefault(); // Evitar que se envíe el formulario inmediatamente
-            const form = document.getElementById("registroForm");
-
-            // Enviar los datos usando Fetch API
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: form.method,
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById("modalExito").style.display = "flex";
-                } else {
-                    alert("Hubo un error al registrar los datos.");
-                }
-            })
-            .catch(error => {
-                alert("Error al enviar los datos: " + error.message);
-            });
-        }
-
-        function cerrarModal() {
-            document.getElementById("modalExito").style.display = "none";
-            document.getElementById("registroForm").reset(); // Limpiar el formulario
-        }
-    </script>
+    <h1>Registrando Asistencia...</h1>
 </body>
 </html>
