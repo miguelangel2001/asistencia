@@ -3,45 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Asistencia</title>
+    <title>Registrando Asistencia...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #mensaje {
+            display: none;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #spinner {
+            border: 6px solid #f3f3f3; /* Light grey */
+            border-top: 6px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="spinner"></div>
+    <div id="mensaje">Registrando asistencia...</div>
+
     <script>
-        // Enviar datos automáticamente al servidor
+        // Función para enviar datos automáticamente
         function enviarDatosAlServidor() {
-            // Obtener parámetros de la URL
+            // Capturar los parámetros de la URL
             const params = new URLSearchParams(window.location.search);
             const nombre = params.get("nombre");
             const apellido = params.get("apellido");
             const unidad = params.get("unidad");
 
-            // Verificar si los parámetros existen
+            // Validar si los datos están presentes
             if (nombre && apellido && unidad) {
+                // Enviar los datos al servidor
                 fetch("http://localhost:8080/empresa/guardarDatos.jsp", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
-                    body: `nombre=${nombre}&apellido=${apellido}&unidad=${unidad}`,
+                    body: `nombre=${encodeURIComponent(nombre)}&apellido=${encodeURIComponent(apellido)}&unidad=${encodeURIComponent(unidad)}`
                 })
-                .then((response) => {
+                .then(response => {
                     if (response.ok) {
-                        alert("Datos registrados con éxito.");
+                        // Mostrar el mensaje de éxito
+                        mostrarMensaje("¡Asistencia registrada con éxito!", true);
                     } else {
-                        alert("Error al registrar los datos.");
+                        // Mostrar mensaje de error
+                        mostrarMensaje("Error al registrar la asistencia.", false);
                     }
                 })
-                .catch((error) => {
+                .catch(error => {
                     console.error("Error:", error);
+                    mostrarMensaje("Error al conectar con el servidor.", false);
                 });
             } else {
-                alert("No se encontraron datos en el QR.");
+                mostrarMensaje("Datos incompletos en el QR.", false);
             }
         }
 
-        // Ejecutar la función al cargar la página
+        // Función para mostrar mensajes
+        function mostrarMensaje(texto, exito) {
+            const mensaje = document.getElementById("mensaje");
+            mensaje.textContent = texto;
+            mensaje.style.backgroundColor = exito ? "#4caf50" : "#e74c3c";
+            mensaje.style.display = "block";
+
+            // Ocultar el spinner
+            document.getElementById("spinner").style.display = "none";
+
+            // Redirigir después de 3 segundos (opcional)
+            if (exito) {
+                setTimeout(() => {
+                    window.location.href = "http://localhost:8080/empresa/admin.jsp";
+                }, 3000);
+            }
+        }
+
+        // Ejecutar al cargar la página
         window.onload = enviarDatosAlServidor;
     </script>
-</head>
-<body>
-    <h1>Registrando Asistencia...</h1>
 </body>
 </html>
