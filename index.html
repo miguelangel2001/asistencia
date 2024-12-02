@@ -53,15 +53,22 @@
         button:hover {
             background-color: #45a049;
         }
-        .success-message {
+        .success-message, .error-message {
             display: none;
             margin-top: 20px;
             padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success-message {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            text-align: center;
+        }
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -81,40 +88,46 @@
             <button type="submit">Enviar</button>
         </form>
 
-        <!-- Mensaje de éxito -->
+        <!-- Mensajes -->
         <div id="successMessage" class="success-message">
             ¡Datos enviados con éxito!
+        </div>
+        <div id="errorMessage" class="error-message">
+            Ocurrió un error al enviar los datos.
         </div>
     </div>
 
     <script>
         const form = document.getElementById('registroForm');
         const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
 
         form.addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevenir el envío del formulario para manejarlo manualmente
+            e.preventDefault(); // Evitar redirección del formulario
 
-            // Obtener datos del formulario
+            // Crear un objeto con los datos del formulario
             const formData = new FormData(form);
 
-            // Enviar datos al servidor usando fetch
+            // Enviar los datos al servidor usando fetch
             fetch('http://localhost:8080/empresa/guardarDatos.jsp', {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
                 if (response.ok) {
-                    // Mostrar el mensaje de éxito
+                    // Mostrar mensaje de éxito
                     successMessage.style.display = 'block';
-                    form.reset(); // Reiniciar el formulario
+                    errorMessage.style.display = 'none';
+                    form.reset(); // Reiniciar formulario
                 } else {
-                    // Mostrar un error si ocurre algo
-                    alert('Error al enviar los datos. Inténtalo de nuevo.');
+                    throw new Error('Error al registrar los datos en el servidor.');
                 }
             })
             .catch(error => {
+                // Mostrar mensaje de error
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
                 console.error('Error:', error);
-                alert('Ocurrió un error al conectar con el servidor.');
             });
         });
     </script>
